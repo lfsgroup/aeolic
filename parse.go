@@ -14,7 +14,7 @@ func parse(templateName string, templateMap map[string]string, data any) ([]byte
 
 	slackTemplates, ok := templateMap[templateName]
 	if !ok {
-		return []byte{}, fmt.Errorf("template [%s] does not exist", templateName)
+		return []byte{}, fmt.Errorf("template %s does not exist", templateName)
 	}
 
 	tmpl, err := template.New(templateName).Option("missingkey=error").Parse(slackTemplates)
@@ -48,7 +48,8 @@ func withTemplates(dirPath string, fileSuffix string) (map[string]string, error)
 			if err != nil {
 				return rootTemplates, err
 			}
-			rootTemplates[fileLocation] = string(data)
+			stripedFileName := strings.TrimRight(file.Name(), fileSuffix)
+			rootTemplates[stripedFileName] = string(data)
 		}
 	}
 	return rootTemplates, nil

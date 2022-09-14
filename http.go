@@ -1,6 +1,7 @@
 package aeolic
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
@@ -22,13 +23,32 @@ func call(url string, method string, body io.Reader, client httpClient, headers 
 	if err != nil {
 		return resp, err
 	}
-	if resp.StatusCode > 399 {
-		return resp, &APIError{
-			StatusCode: resp.StatusCode,
-			StatusText: http.StatusText(resp.StatusCode),
+
+	if resp.Body == nil {
+		if resp.StatusCode > 399 {
+			return resp, &APIError{
+				StatusCode: resp.StatusCode,
+				StatusText: http.StatusText(resp.StatusCode),
+			}
 		}
+		return resp, nil
 	}
-	return resp, err
+
+	var slackErr slackErrorResp
+	if err := json.NewDecoder(resp.Body).Decode(&slackErr); err != nil {
+		return resp, err
+	}
+
+	if slackErr.OK {
+		return resp, nil
+	}
+
+	return resp, &APIError{
+		StatusCode: resp.StatusCode,
+		StatusText: http.StatusText(resp.StatusCode),
+		Message:    slackErr.Error,
+		Context:    errorMessageContextUrl,
+	}
 }
 
 // mergeHeaders - merge a slice of headers
@@ -46,7 +66,7 @@ func mergeHeaders(headersList ...map[string]string) map[string]string {
 func setDefaultHeaders(apiKey string) map[string]string {
 	return map[string]string{
 		"Authorization": fmt.Sprintf("Bearer %v", apiKey),
-		"Content-Type":  "application/x-www-form-urlencoded",
+		"Content-Type":  "application/json",
 	}
 }
 
