@@ -20,8 +20,7 @@ func main() {
 	}
 
 	if err := c.SendMessage(channel, "basic", map[string]string{
-		"url_link":  "some-link",
-		"user_name": "some-user-name",
+		"user_name": "Allan Bond",
 	}); err != nil {
 		log.Fatal("failed ", err)
 	}
