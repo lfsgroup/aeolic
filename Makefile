@@ -18,6 +18,9 @@ LOCAL_ENV_MINE=$(PROJECT_ROOT)/.env.local.mine
 -include $(ENV_CONTEXT) $(LOCAL_ENV_MINE)
 
 
+test: ## Run unit tests
+	go test --short -cover -failfast ./...
+
 test_integration: test_build ## Integration test, post to slack channel
 	SLACK_API_TOKEN=$(SLACK_API_TOKEN) TEST_SLACK_CHANNEL=$(TEST_SLACK_CHANNEL)  ./$(APP_NAME)
 
