@@ -22,7 +22,7 @@ test: ## Run unit tests
 	go test --short -cover -failfast ./...
 
 test_integration: test_build ## Integration test, post to slack channel
-	SLACK_API_TOKEN=$(SLACK_API_TOKEN) TEST_SLACK_CHANNEL=$(TEST_SLACK_CHANNEL)  ./$(APP_NAME)
+	SLACK_API_TOKEN=$(SLACK_API_TOKEN) TEST_SLACK_CHANNEL=$(TEST_SLACK_CHANNEL) SLACK_TEMPLATE_FOLDER=$(SLACK_TEMPLATE_FOLDER)  ./$(APP_NAME)
 
 test_build: ## Build test binary
 	go build -o $(APP_NAME) ./cmd/slack

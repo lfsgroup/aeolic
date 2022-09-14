@@ -8,11 +8,12 @@ import (
 )
 
 func main() {
-
+	// see env variables .env.local
 	token := os.Getenv("SLACK_API_TOKEN")
 	channel := os.Getenv("TEST_SLACK_CHANNEL")
+	templateFolder := os.Getenv("SLACK_TEMPLATE_FOLDER")
 
-	c, err := aeolic.New(token, "./examples")
+	c, err := aeolic.New(token, templateFolder)
 
 	if err != nil {
 		log.Fatal("error init slack client ", err)

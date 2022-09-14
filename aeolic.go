@@ -19,7 +19,7 @@ type Client struct {
 }
 
 func New(apiKey string, templateDir string) (Client, error) {
-	templates, err := withTemplates(templateDir, ".tmpl")
+	templates, err := withTemplates(templateDir, ".tmpl.json")
 	if err != nil {
 		return Client{}, err
 	}
@@ -44,13 +44,14 @@ func (c *Client) SendMessage(channel string, templateName string, body any) erro
 		return fmt.Errorf("could not parse template [%s] error [%w]", templateName, err)
 	}
 
-	payload := slackChannelPayload{
-		Channel: channel,
-		Blocks:  parsedOutput,
+	payload := slackChannelPayload{}
+	if err := json.Unmarshal(parsedOutput, &payload); err != nil {
+		return err
 	}
 
-	data, err := json.Marshal(&payload)
+	payload.Channel = channel
 
+	data, err := json.Marshal(&payload)
 	if err != nil {
 		return err
 	}

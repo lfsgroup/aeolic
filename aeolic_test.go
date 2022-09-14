@@ -23,7 +23,7 @@ func Test_parse_simple(t *testing.T) {
 	assert.Equal(t, `{ "hello": "world" }`, string(got))
 }
 
-//go:embed examples/basic.tmpl
+//go:embed examples/basic.tmpl.json
 var embedTest string
 
 func Test_parse_embed(t *testing.T) {
