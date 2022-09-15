@@ -45,8 +45,8 @@ func call(url string, method string, body io.Reader, client httpClient, headers 
 	}
 
 	return resp, &APIError{
-		StatusCode: resp.StatusCode,
-		StatusText: http.StatusText(resp.StatusCode),
+		StatusCode: http.StatusBadRequest,
+		StatusText: http.StatusText(http.StatusBadRequest),
 		Message:    slackErr.Error,
 		Context:    errorMessageContextUrl,
 	}
