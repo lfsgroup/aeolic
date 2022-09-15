@@ -24,13 +24,14 @@ func call(url string, method string, body io.Reader, client httpClient, headers 
 		return resp, err
 	}
 
-	if resp.Body == nil {
-		if resp.StatusCode > 399 {
-			return resp, &APIError{
-				StatusCode: resp.StatusCode,
-				StatusText: http.StatusText(resp.StatusCode),
-			}
+	if resp.StatusCode > 399 {
+		return resp, &APIError{
+			StatusCode: resp.StatusCode,
+			StatusText: http.StatusText(resp.StatusCode),
 		}
+	}
+
+	if resp.Body == nil {
 		return resp, nil
 	}
 

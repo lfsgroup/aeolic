@@ -44,6 +44,7 @@ func (c *Client) SendMessage(channel string, templateName string, body any) erro
 		return fmt.Errorf("could not parse template [%s] error [%w]", templateName, err)
 	}
 
+	// hydrate blocks data
 	payload := slackChannelPayload{}
 	if err := json.Unmarshal(parsedOutput, &payload); err != nil {
 		return err

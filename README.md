@@ -9,9 +9,91 @@ Opinionated approach to sending slack requests to a channel:
 3. The aeloic code makes the slack call
 4. Profit
 
-### Example
-See example client at cmd/slack/main.go
+<br>
+
+----
+
+<br>
+
+## Getting started
 
 
+<br>
 
-simple slack client that uses templates rather than block builder funcs
+### Adding Templates
+Create a directory and add files with the suffix `tmpl.json`. When creating a new instance of aeolic, pass in the directory path, aeolic will automatically load all files matching the suffix.
+
+template names are the names of the file without the suffix, for example:
+
+file: `basic.tmpl.json`
+template name: `basic`
+
+<br>
+
+----
+
+<br>
+
+
+### Making the slack call
+
+Create a new instance with the slack token and the path to your templates directory.
+
+
+```golang
+
+	c, err := aeolic.New("<your-slack-token>", "<path/to/template/dir>")
+
+	if err != nil {
+        // handle error
+	}
+
+```
+
+Make the api call
+
+```golang
+
+
+	if err := c.SendMessage("<your-slack-channel-id>", "<template-name>", map[string]string{
+		"hello": "world",
+	}); err != nil {
+        // handle error
+	}
+
+```
+
+<br>
+
+----
+
+<br>
+
+## Error Handling
+
+<br>
+
+### API error
+
+Handling API errors
+
+```golang
+
+	if err := c.SendMessage("<your-slack-channel-id>", "<template-name>", map[string]string{
+		"hello": "world",
+	}); err != nil {
+        var apiErr *fetch.APIError
+        if errors.As(err, &apiErr) {
+            // non 2xx,3xx response
+            // StatusCode: 400
+            // StatusText: Bad Request
+            // Message: "invalid_blocks"
+            // Context: "https://api.slack.com/methods/chat.postMessage#errors"
+            fmt.PrintLn(apiErr)
+
+            /** ... */
+        }
+	}
+
+
+```
