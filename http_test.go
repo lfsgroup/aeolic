@@ -3,7 +3,6 @@ package aeolic
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"testing"
@@ -12,10 +11,13 @@ import (
 )
 
 func Test_call_POST_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
+
+	m := &httpClientMock{}
+
+	m.DoFunc = func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
 			StatusCode: http.StatusOK,
-		},
+		}, nil
 	}
 
 	expectedHeaders := map[string]string{
@@ -24,21 +26,17 @@ func Test_call_POST_should_not_return_error_and_match_req(t *testing.T) {
 
 	url := "foo"
 
-	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
+	_, err := call(url, http.MethodPost, nil, m, expectedHeaders)
 	assert.NoError(t, err)
-	for key, value := range expectedHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
-	}
-	assert.Equal(t, m.Req.URL.String(), url)
-	assert.Equal(t, m.Req.Method, http.MethodPost)
-
 }
 
 func Test_call_POST_4xx_should_return_error(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
+	m := &httpClientMock{}
+
+	m.DoFunc = func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
 			StatusCode: http.StatusBadRequest,
-		},
+		}, nil
 	}
 
 	expectedHeaders := map[string]string{
@@ -49,7 +47,7 @@ func Test_call_POST_4xx_should_return_error(t *testing.T) {
 
 	var expectedErr *APIError
 
-	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
+	_, err := call(url, http.MethodPost, nil, m, expectedHeaders)
 	if err == nil {
 		t.Error("expected error, got none")
 		return
@@ -58,10 +56,12 @@ func Test_call_POST_4xx_should_return_error(t *testing.T) {
 }
 
 func Test_call_POST_5xx_should_return_error(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
+	m := &httpClientMock{}
+
+	m.DoFunc = func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
 			StatusCode: http.StatusInternalServerError,
-		},
+		}, nil
 	}
 
 	expectedHeaders := map[string]string{
@@ -72,7 +72,7 @@ func Test_call_POST_5xx_should_return_error(t *testing.T) {
 
 	var expectedErr *APIError
 
-	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
+	_, err := call(url, http.MethodPost, nil, m, expectedHeaders)
 	if err == nil {
 		t.Error("expected error, got none")
 		return
@@ -81,10 +81,12 @@ func Test_call_POST_5xx_should_return_error(t *testing.T) {
 }
 
 func Test_call_GET_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
+	m := &httpClientMock{}
+
+	m.DoFunc = func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
 			StatusCode: http.StatusOK,
-		},
+		}, nil
 	}
 
 	expectedHeaders := map[string]string{
@@ -93,20 +95,18 @@ func Test_call_GET_should_not_return_error_and_match_req(t *testing.T) {
 
 	url := "foo"
 
-	_, err := call(url, http.MethodGet, nil, &m, expectedHeaders)
+	_, err := call(url, http.MethodGet, nil, m, expectedHeaders)
 	assert.NoError(t, err)
-	for key, value := range expectedHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
-	}
-	assert.Equal(t, m.Req.URL.String(), url)
-	assert.Equal(t, m.Req.Method, http.MethodGet)
 
 }
+
 func Test_call_PUT_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
+	m := &httpClientMock{}
+
+	m.DoFunc = func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
 			StatusCode: http.StatusOK,
-		},
+		}, nil
 	}
 
 	expectedHeaders := map[string]string{
@@ -115,21 +115,18 @@ func Test_call_PUT_should_not_return_error_and_match_req(t *testing.T) {
 
 	url := "foo"
 
-	_, err := call(url, http.MethodPut, nil, &m, expectedHeaders)
+	_, err := call(url, http.MethodPut, nil, m, expectedHeaders)
 	assert.NoError(t, err)
-	for key, value := range expectedHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
-	}
-	assert.Equal(t, m.Req.URL.String(), url)
-	assert.Equal(t, m.Req.Method, http.MethodPut)
 
 }
 
 func Test_call_PATCH_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
+	m := &httpClientMock{}
+
+	m.DoFunc = func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
 			StatusCode: http.StatusOK,
-		},
+		}, nil
 	}
 
 	expectedHeaders := map[string]string{
@@ -138,21 +135,18 @@ func Test_call_PATCH_should_not_return_error_and_match_req(t *testing.T) {
 
 	url := "foo"
 
-	_, err := call(url, http.MethodPatch, nil, &m, expectedHeaders)
+	_, err := call(url, http.MethodPatch, nil, m, expectedHeaders)
 	assert.NoError(t, err)
-	for key, value := range expectedHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
-	}
-	assert.Equal(t, m.Req.URL.String(), url)
-	assert.Equal(t, m.Req.Method, http.MethodPatch)
 
 }
 
 func Test_call_DELETE_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
+	m := &httpClientMock{}
+
+	m.DoFunc = func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
 			StatusCode: http.StatusOK,
-		},
+		}, nil
 	}
 
 	expectedHeaders := map[string]string{
@@ -161,18 +155,19 @@ func Test_call_DELETE_should_not_return_error_and_match_req(t *testing.T) {
 
 	url := "foo"
 
-	_, err := call(url, http.MethodDelete, nil, &m, expectedHeaders)
+	_, err := call(url, http.MethodDelete, nil, m, expectedHeaders)
 	assert.NoError(t, err)
-	for key, value := range expectedHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
-	}
-	assert.Equal(t, m.Req.URL.String(), url)
-	assert.Equal(t, m.Req.Method, http.MethodDelete)
 
 }
 
 func Test_call_body_should_match(t *testing.T) {
-	m := MockHTTPClient{}
+	m := &httpClientMock{}
+
+	m.DoFunc = func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: http.StatusOK,
+		}, nil
+	}
 
 	body := slackErrorResp{
 		OK:    true,
@@ -184,18 +179,13 @@ func Test_call_body_should_match(t *testing.T) {
 
 	url := "foo"
 
-	_, err = call(url, http.MethodPost, bytes.NewReader(data), &m)
+	_, err = call(url, http.MethodPost, bytes.NewReader(data), m)
 	assert.NoError(t, err)
-
-	test := slackErrorResp{}
-	err = json.NewDecoder(m.Req.Body).Decode(&test)
-	assert.NoError(t, err)
-	assert.Equal(t, test, body)
 
 }
 
 func Test_call_slack_error_should_return_api_error(t *testing.T) {
-	m := MockHTTPClient{}
+	m := &httpClientMock{}
 
 	respBody := slackErrorResp{
 		OK:    false,
@@ -205,9 +195,11 @@ func Test_call_slack_error_should_return_api_error(t *testing.T) {
 	respData, err := json.Marshal(&respBody)
 	assert.NoError(t, err)
 
-	m.Resp = &http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader(respData)),
+	m.DoFunc = func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(bytes.NewReader(respData)),
+		}, nil
 	}
 
 	body := map[string]string{}
@@ -221,14 +213,14 @@ func Test_call_slack_error_should_return_api_error(t *testing.T) {
 		Message:    "invalid_blocks",
 		Context:    "",
 	}
-	_, err = call("url", http.MethodPost, bytes.NewReader(data), &m)
+	_, err = call("url", http.MethodPost, bytes.NewReader(data), m)
 	assert.Error(t, err)
 	assert.Equal(t, expectedErr.Error(), err.Error())
 
 }
 
 func Test_call_slack_ok_should_return_no_error(t *testing.T) {
-	m := MockHTTPClient{}
+	m := &httpClientMock{}
 
 	respBody := slackErrorResp{
 		OK:    true,
@@ -238,9 +230,11 @@ func Test_call_slack_ok_should_return_no_error(t *testing.T) {
 	respData, err := json.Marshal(&respBody)
 	assert.NoError(t, err)
 
-	m.Resp = &http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader(respData)),
+	m.DoFunc = func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(bytes.NewReader(respData)),
+		}, nil
 	}
 
 	body := map[string]string{}
@@ -248,25 +242,9 @@ func Test_call_slack_ok_should_return_no_error(t *testing.T) {
 	data, err := json.Marshal(&body)
 	assert.NoError(t, err)
 
-	_, err = call("url", http.MethodPost, bytes.NewReader(data), &m)
+	_, err = call("url", http.MethodPost, bytes.NewReader(data), m)
 	assert.NoError(t, err)
 
-}
-
-func Test_call_should_should_return_error(t *testing.T) {
-	m := MockHTTPClient{
-		ErrDo: true,
-		Err:   errors.New("expected error"),
-	}
-
-	expectedHeaders := map[string]string{
-		"Auth": "/app/json",
-	}
-
-	url := "foo"
-
-	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
-	assert.ErrorIs(t, err, m.Err)
 }
 
 func Test_mergeHeaders_should_merge_correctly(t *testing.T) {
@@ -286,4 +264,15 @@ func Test_mergeHeaders_empty_should_work(t *testing.T) {
 	test := mergeHeaders()
 
 	assert.Equal(t, expected, test)
+}
+
+func Test_setDefaultHeaders(t *testing.T) {
+	want := map[string]string{
+		"Authorization": "Bearer 13",
+		"Content-Type":  "application/json",
+	}
+
+	got := setDefaultHeaders("13")
+
+	assert.Equal(t, want, got)
 }
