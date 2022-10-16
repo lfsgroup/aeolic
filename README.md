@@ -65,6 +65,41 @@ Make the api call
 
 <br>
 
+### Provide your own template map
+
+<br>
+
+Using go [embed](https://pkg.go.dev/embed) feature you can provide your own template map, the template name will be the key.
+
+```golang
+import (
+        _ "embed"
+)
+
+//go:embed templates/basic.tmpl.json
+var basicTemplate string
+
+func main() {
+
+	customMap := map[string]string{
+		"basic": basicTemplate,
+	}
+
+	c := aeolic.NewWithMap(<token>, customMap)
+
+	if err := c.SendMessage(channel, "basic", map[string]string{
+		"user_name": "Allan Bond",
+	}); err != nil {
+		log.Fatal("failed ", err)
+	}
+
+}
+
+
+```
+
+<br>
+
 ----
 
 <br>

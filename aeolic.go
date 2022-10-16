@@ -18,6 +18,7 @@ type Client struct {
 	HTTPClient     httpClient
 }
 
+// New - returns a new client with the templates loaded from the provided directory.
 func New(apiKey string, templateDir string) (Client, error) {
 	templates, err := withTemplates(templateDir, ".tmpl.json")
 	if err != nil {
@@ -29,6 +30,19 @@ func New(apiKey string, templateDir string) (Client, error) {
 		HTTPClient:     setDefaultClient(),
 	}
 	return c, nil
+}
+
+// NewWithMap - returns a new client with the provided custom template map.
+// Use this method if wish to leverage the embed feature of golang more information can be found: https://pkg.go.dev/embed.
+// Note they template name will be the key of the map.
+
+// working example: cmd/embed_slack/main.go
+func NewWithMap(apiKey string, templateMap map[string]string) Client {
+	return Client{
+		Templates:      templateMap,
+		DefaultHeaders: setDefaultHeaders(apiKey),
+		HTTPClient:     setDefaultClient(),
+	}
 }
 
 type slackChannelPayload struct {
