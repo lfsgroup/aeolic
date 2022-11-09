@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/code-gorilla-au/aeolic"
+	"github.com/lfsgroup/aeolic"
 )
 
 func main() {
