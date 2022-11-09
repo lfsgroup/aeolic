@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 )
 
 const (
@@ -20,7 +21,11 @@ type Client struct {
 
 // New - returns a new client with the templates loaded from the provided directory.
 func New(apiKey string, templateDir string) (Client, error) {
-	templates, err := withTemplates(templateDir, ".tmpl.json")
+	files, err := os.ReadDir(templateDir)
+	if err != nil {
+		return Client{}, err
+	}
+	templates, err := withTemplates(files, ".tmpl.json")
 	if err != nil {
 		return Client{}, err
 	}
