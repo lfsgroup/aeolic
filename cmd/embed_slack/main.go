@@ -6,7 +6,7 @@ import (
 
 	_ "embed"
 
-	"github.com/code-gorilla-au/aeolic"
+	"github.com/lfsgroup/aeolic"
 )
 
 //go:embed templates/basic.tmpl.json
