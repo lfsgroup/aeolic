@@ -2,6 +2,7 @@ package aeolic
 
 import (
 	"bytes"
+	"embed"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -25,7 +26,7 @@ func New(apiKey string, templateDir string) (Client, error) {
 	if err != nil {
 		return Client{}, err
 	}
-	templates, err := withTemplates(files, ".tmpl.json")
+	templates, err := withTemplates(files, templateDir, ".tmpl.json")
 	if err != nil {
 		return Client{}, err
 	}
@@ -48,6 +49,23 @@ func NewWithMap(apiKey string, templateMap map[string]string) Client {
 		DefaultHeaders: setDefaultHeaders(apiKey),
 		HTTPClient:     setDefaultClient(),
 	}
+}
+
+func NewWithEmbeddedFS(f embed.FS, apiKey string, templateDir string) (Client, error) {
+	files, err := f.ReadDir(templateDir)
+	if err != nil {
+		return Client{}, err
+	}
+	templates, err := withTemplates(files, templateDir, ".tmpl.json")
+	if err != nil {
+		return Client{}, err
+	}
+	c := Client{
+		Templates:      templates,
+		DefaultHeaders: setDefaultHeaders(apiKey),
+		HTTPClient:     setDefaultClient(),
+	}
+	return c, nil
 }
 
 type slackChannelPayload struct {

@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -34,12 +35,13 @@ func parse(templateName string, templateMap map[string]string, data any) ([]byte
 }
 
 // withTemplates - load templates by directory entry
-func withTemplates(files []fs.DirEntry, fileSuffix string) (map[string]string, error) {
+func withTemplates(files []fs.DirEntry, dirPath, fileSuffix string) (map[string]string, error) {
 	rootTemplates := map[string]string{}
 
 	for _, file := range files {
+		fileLocation := filepath.Join(dirPath, file.Name())
 		if strings.HasSuffix(file.Name(), fileSuffix) {
-			data, err := os.ReadFile(file.Name())
+			data, err := os.ReadFile(fileLocation)
 			if err != nil {
 				return rootTemplates, err
 			}
