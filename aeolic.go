@@ -48,6 +48,7 @@ func NewWithMap(apiKey string, templateMap map[string]string) Client {
 	}
 }
 
+// NewWithFS - returns a new client with the templates loaded from the provided directory and file system.
 func NewWithFS(apiKey string, dir fs.FS, templateDir string) (Client, error) {
 	templates, err := withTemplates(dir, templateDir, ".tmpl.json")
 	if err != nil {
