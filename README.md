@@ -94,8 +94,30 @@ func main() {
 	}
 
 }
+```
+<br>
 
+### Provide your own file system
+Using go [embed](https://pkg.go.dev/embed) feature you can provide your own file system.
 
+```go
+import (
+	_ "embed"
+)
+//go:embed templates/*.tmpl.json
+var content embed.FS
+
+func main() {
+
+	c := aeolic.NewWithFS(<token>, content, "templates")
+
+	if err := c.SendMessage(channel, "basic", map[string]string{
+		"user_name": "Allan Bond",
+	}); err != nil {
+		log.Fatal("failed ", err)
+	}
+
+}
 ```
 
 <br>
