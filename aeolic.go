@@ -51,7 +51,7 @@ func NewWithMap(apiKey string, templateMap map[string]string) Client {
 	}
 }
 
-func NewWithFS(dir fs.FS, apiKey string, templateDir string) (Client, error) {
+func NewWithFS(apiKey string, dir fs.FS, templateDir string) (Client, error) {
 	files, err := fs.ReadDir(dir, templateDir)
 	if err != nil {
 		return Client{}, err
