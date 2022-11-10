@@ -41,7 +41,7 @@ func withTemplates(files []fs.DirEntry, dirPath, fileSuffix string) (map[string]
 	for _, file := range files {
 		fileLocation := filepath.Join(dirPath, file.Name())
 		if strings.HasSuffix(file.Name(), fileSuffix) {
-			data, err := os.ReadFile(fileLocation)
+			data, err := os.ReadFile(filepath.Clean(fileLocation))
 			if err != nil {
 				return rootTemplates, err
 			}
