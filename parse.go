@@ -33,7 +33,7 @@ func parse(templateName string, templateMap map[string]string, data any) ([]byte
 	return buf.Bytes(), nil
 }
 
-// withTemplates - load templates by directory entry
+// withTemplates - load templates by file system and path
 func withTemplates(fsys fs.FS, dirPath, fileSuffix string) (map[string]string, error) {
 	rootTemplates := map[string]string{}
 
