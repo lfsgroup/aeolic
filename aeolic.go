@@ -23,16 +23,7 @@ type Client struct {
 // New - returns a new client with the templates loaded from the provided directory.
 func New(apiKey string, templateDir string) (Client, error) {
 	fsys := os.DirFS("./")
-	templates, err := withTemplates(fsys, templateDir, ".tmpl.json")
-	if err != nil {
-		return Client{}, err
-	}
-	c := Client{
-		Templates:      templates,
-		DefaultHeaders: setDefaultHeaders(apiKey),
-		HTTPClient:     setDefaultClient(),
-	}
-	return c, nil
+	return NewWithFS(apiKey, fsys, templateDir)
 }
 
 // NewWithMap - returns a new client with the provided custom template map.
