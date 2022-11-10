@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"net/http"
+	"os"
 )
 
 const (
@@ -20,16 +22,8 @@ type Client struct {
 
 // New - returns a new client with the templates loaded from the provided directory.
 func New(apiKey string, templateDir string) (Client, error) {
-	templates, err := withTemplates(templateDir, ".tmpl.json")
-	if err != nil {
-		return Client{}, err
-	}
-	c := Client{
-		Templates:      templates,
-		DefaultHeaders: setDefaultHeaders(apiKey),
-		HTTPClient:     setDefaultClient(),
-	}
-	return c, nil
+	fsys := os.DirFS("./")
+	return NewWithFS(apiKey, fsys, templateDir)
 }
 
 // NewWithMap - returns a new client with the provided custom template map.
@@ -43,6 +37,20 @@ func NewWithMap(apiKey string, templateMap map[string]string) Client {
 		DefaultHeaders: setDefaultHeaders(apiKey),
 		HTTPClient:     setDefaultClient(),
 	}
+}
+
+// NewWithFS - returns a new client with the templates loaded from the provided directory and file system.
+func NewWithFS(apiKey string, dir fs.FS, templateDir string) (Client, error) {
+	templates, err := withTemplates(dir, templateDir, ".tmpl.json")
+	if err != nil {
+		return Client{}, err
+	}
+	c := Client{
+		Templates:      templates,
+		DefaultHeaders: setDefaultHeaders(apiKey),
+		HTTPClient:     setDefaultClient(),
+	}
+	return c, nil
 }
 
 type slackChannelPayload struct {
