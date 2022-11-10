@@ -22,7 +22,7 @@ type Client struct {
 
 // New - returns a new client with the templates loaded from the provided directory.
 func New(apiKey string, templateDir string) (Client, error) {
-	fsys := os.DirFS(templateDir)
+	fsys := os.DirFS("./")
 	templates, err := withTemplates(fsys, templateDir, ".tmpl.json")
 	if err != nil {
 		return Client{}, err
