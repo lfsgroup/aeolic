@@ -2,9 +2,9 @@ package aeolic
 
 import (
 	"bytes"
-	"embed"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 )
@@ -51,8 +51,8 @@ func NewWithMap(apiKey string, templateMap map[string]string) Client {
 	}
 }
 
-func NewWithEmbeddedFS(f embed.FS, apiKey string, templateDir string) (Client, error) {
-	files, err := f.ReadDir(templateDir)
+func NewWithFS(dir fs.FS, apiKey string, templateDir string) (Client, error) {
+	files, err := fs.ReadDir(dir, templateDir)
 	if err != nil {
 		return Client{}, err
 	}
