@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"html/template"
 	"io/fs"
 	"path/filepath"
 	"strings"
+	"text/template"
 )
 
 func parse(templateName string, templateMap map[string]string, data any) ([]byte, error) {
